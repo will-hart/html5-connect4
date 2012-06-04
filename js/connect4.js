@@ -27,18 +27,6 @@ var RED = 2;
 /* the current team */
 var current_team = YELLOW;
 
-/* define some sprite states */
-var EMPTY_CELL = 0; 		// a disc in the game board
-var PLACE_CELL = 1; 		// where a disc may be placed
-var FILL_CELL = 2; 			// a disc outside the game board
-var WINNING_CELL = 3; 		// a disc that is part of the winning combination
-
-/* the number of sprites in any row */
-var ROW_MULTIPLIER = 3; 	// a multiplier for accessing different sprite rows
-
-/* A blank cell where no sprite is shown */
-var BLANK_CELL = -1;
-
 /* the size of a cell (they are square) */
 var CELL_SIZE = 64;
 
@@ -50,7 +38,7 @@ var animFrames;
 /* an 8x8 array to use to hold the game map */
 var map; 
 
-/* the game canvas */
+/* the game canvas and stage where objects are placed*/
 var game;
 var stage;
 
