@@ -128,11 +128,40 @@ function changePlaceMouseOut(MouseArgs) {
  */
 function placeDiscEvent(MouseArgs)
 {
+	// get the placeholder that was clicked
 	var t = MouseArgs.target;
-	newTurn();
+	
+	// work out the column of the placeholder clicked
+	var addr = t.name.split(",");
+	var col = addr[1];
+	
+	// work out the type of disc we are placing
+	var bma_string = (current_team == YELLOW) ? "yellow_cell" : "red_cell";
+	var placed = false;
+	
+	// now traverse back up the column and place a disc in the first empty block
+	for(var i = 9; i > 1; i--) {
+		var bma = map[col][i]; // get the bitmap
+		
+		// if it is empty, place
+		if (bma.currentAnimation == "empty_cell") {
+			bma.gotoAndPlay(bma_string);
+			placed = true;
+			break; // leave the loop
+		}
+	}
+	
+	// move to the next player's turn
+	if (placed) {
+		checkForWinner();
+		newTurn();
+	} 
 }
 
 
+function checkForWinner() {
+	return false;
+}
 
 /*
  * Changes the currently active team
@@ -215,7 +244,7 @@ function buildGame() {
     		}
     		
     		// configure the bitmap animation position
-    		bma.name=i+":"+j;
+    		bma.name = j + "," + i;
     		bma.x = i * CELL_SIZE;
     		bma.y = j * CELL_SIZE;
     		stage.addChild(bma);
