@@ -24,6 +24,11 @@ var NONE = 0;
 var YELLOW = 1;
 var RED = 2;
 
+/* define some map dimensions */
+var max_row = 6;
+var max_col = 8;
+var header_rows = 2;
+
 /* the current team */
 var current_team = YELLOW;
 
@@ -297,20 +302,20 @@ function buildGame() {
  
     // initialise the game board
     map = [];
-    for (var i = 0; i < 11; i++) {
+    for (var col = 0; col < 11; col++) {
     	var line = [];
-    	for (var j = 0; j < 11; j++) {
+    	for (var row = 0; row < 11; row++) {
     		/// create a new bitmap animation
     		var bma = new BitmapAnimation(spriteSheet);
     		
     		// set up the correct bitmap
-    		if (i > 7) {
+    		if (col > 7) {
     			bma.gotoAndPlay("blank");
     		} else {
-    			if (j == 0)
+    			if (row == 0)
 	    		{
 	    			bma.gotoAndPlay("blank");
-	    		} else if (j == 1){
+	    		} else if (row == 1){
 	    			bma.gotoAndPlay((current_team == YELLOW) ? "place_yellow" : "place_red");
     				bma.onMouseOver = changePlaceMouseOver;
     				bma.onMouseOut = changePlaceMouseOut;
@@ -321,9 +326,9 @@ function buildGame() {
     		}
     		
     		// configure the bitmap animation position
-    		bma.name = j + "," + i;
-    		bma.x = i * CELL_SIZE;
-    		bma.y = j * CELL_SIZE;
+    		bma.name = row + "," + col;
+    		bma.x = col * CELL_SIZE;
+    		bma.y = row * CELL_SIZE;
     		stage.addChild(bma);
 	    	line.push(bma);
     	}
@@ -331,10 +336,3 @@ function buildGame() {
     }
 }
 
-
-/* 
- * Gets a sprite index based on the row and column provided
- */
-function getSpriteIdx(state, colour) {
-	return state * ROW_MULTIPLIER + colour;
-}
