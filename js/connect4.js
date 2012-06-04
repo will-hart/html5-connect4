@@ -99,6 +99,10 @@ function imgLoadError() {
  * An event that changes the image of the given target
  */
 function changePlaceMouseOver(MouseArgs) {
+	
+	// check if we have had a winner already
+	if (current_team == NONE) return;
+	
 	// get the target object
 	var t = MouseArgs.target;
 
@@ -113,6 +117,10 @@ function changePlaceMouseOver(MouseArgs) {
  * An event that changes the image of the given place row 
  */
 function changePlaceMouseOut(MouseArgs) {
+	
+	// check if we have had a winner already
+	if (current_team == NONE) return;
+	
 	// get the target object
 	var t = MouseArgs.target;
 
@@ -126,10 +134,9 @@ function changePlaceMouseOut(MouseArgs) {
 /*
  * An event that places a new disc in the map
  */
-function placeDiscEvent(MouseArgs)
-{
-	// make sure we haven't found a winner
-	if (current_team == NONE) return; 
+function placeDiscEvent(MouseArgs) {
+	// check if we have had a winner already
+	if (current_team == NONE) return;
 	
 	// get the placeholder that was clicked
 	var t = MouseArgs.target;
@@ -208,7 +215,6 @@ function checkForWinner(row, col, level, team, prev_row, prev_col) {
 						if (r != 0 || c != 0) { // prevent checking the same cell repeatedly
 							if (checkForWinner(row + r, col + c, level + 1, team, row, col)) {
 								declareWinner(row,col,team);
-								current_team = NONE;
 								return true;
 							}
 						}
@@ -244,12 +250,17 @@ function checkForWinner(row, col, level, team, prev_row, prev_col) {
 function declareWinner(row, col, team) {
 	var win_str = (team == YELLOW) ? "win_yellow" : "win_red";
 	map[col][row].gotoAndPlay(win_str);
+	current_team = NONE;
 }
 
 /*
  * Changes the currently active team
  */
 function newTurn() {
+	
+	// check if we have had a winner already
+	if (current_team == NONE) return;
+	
 	var bma_string = "";
 	
 	// work out our new game board state
@@ -297,7 +308,7 @@ function buildGame() {
     stage.enableMouseOver(); // allow mouseover events
     
     // set up a game ticker
-    Ticker.addListener(window);
+    Ticker.addListener(stage);
     Ticker.useRAF = true;
     Ticker.setFPS(60);
  
@@ -335,14 +346,6 @@ function buildGame() {
     	}
     	map.push(line);
     }
-}
-
-/*
- * The tick function updates the stage based on the game state
- */
-function tick() {
-	// redraw the stage
-	stage.update();
 }
 
 
