@@ -7,7 +7,7 @@
 		<script type="text/javascript" src="js/connect4.js"> </script>
 	</head>
 
-	<body>
+	<body onLoad="init();">
 		<div class="container">
 			<h1 class="info-box">HTML5 ConnectFour</h1>
 			<div class="info-box">
@@ -17,8 +17,10 @@
 			
 			
 			<!-- The game canvas -->
-			<div id="gameCanvas">
-				
+			<div id="gameArea">
+				<canvas id="gameCanvas">
+            		Your browser doesn't support canvas. Please download Chrome, Firefox, Safari or Opera
+        		</canvas>
 			</div>
 		</div>
 		

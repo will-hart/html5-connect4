@@ -15,10 +15,17 @@ h1 {
 	margin-bottom: 15px;
 }
 
-#gameCanvas {
+#gameArea {
 	margin: 30px auto 10px auto;
 	width: 940px;
 	height: 768px;
 	background: #EEE;
 	border: 1px solid #DDD;
+}
+
+#gameCanvas {
+	margin:0px;
+	padding:0px;
+	width: 100%;
+	height: 100%;
 }
