@@ -17,8 +17,8 @@ h1 {
 
 #gameArea {
 	margin: 30px auto 10px auto;
-	width: 940px;
-	height: 768px;
+	width: 640px;
+	height: 640px;
 	background: #EEE;
 	border: 1px solid #DDD;
 }

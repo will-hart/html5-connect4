@@ -18,10 +18,14 @@
  * Start by defining some constants to be used in the application 
  */
 
+
 /* define sprite colours */
 var NONE = 0; 
 var YELLOW = 1;
 var RED = 2;
+
+/* the current team */
+var current_team = RED;
 
 /* define some sprite states */
 var EMPTY_CELL = 0; 		// a disc in the game board
@@ -44,7 +48,7 @@ var spriteSheet;
 var animFrames;
 
 /* an 8x8 array to use to hold the game map */
-var map = []; 
+var map; 
 
 /* the game canvas */
 var game;
@@ -92,12 +96,70 @@ function imgLoadError() {
 
 
 /*
+ * An event that changes the image of the given target
+ */
+function changePlaceMouseOver(MouseArgs) {
+	// get the target object
+	var t = MouseArgs.target;
+
+	// find the new animation based on current animation
+	var newAnim = (current_team == YELLOW) ? "fill_yellow" : "fill_red";
+		
+	// set the new animation
+	t.gotoAndPlay(newAnim);
+}
+
+/*
+ * An event that changes the image of the given place row 
+ */
+function changePlaceMouseOut(MouseArgs) {
+	// get the target object
+	var t = MouseArgs.target;
+
+	// find the new animation based on current animation
+	var newAnim = (current_team == YELLOW) ? "place_yellow" : "place_red";
+		
+	// set the new animation
+	t.gotoAndPlay(newAnim);
+}
+
+/*
+ * An event that places a new disc in the map
+ */
+function placeDiscEvent(MouseArgs)
+{
+	var t = MouseArgs.target;
+	newTurn();
+}
+
+
+
+/*
+ * Changes the currently active team
+ */
+function newTurn() {
+	var bma_string = "";
+	
+	// work out our new game board state
+	if (current_team == YELLOW) {
+		current_team = RED;
+		bma_string = "place_red";
+	} else {
+		current_team = YELLOW;
+		bma_string = "place_yellow";
+	}
+	
+	// set the placement images at the top of the board
+	for (var i = 0; i < 8; i++) {
+		var bma = map[i][1];
+		bma.gotoAndPlay(bma_string);
+	}
+}
+
+/*
  * 'Builds' the game by loading resources and setting up a timer
  */
 function buildGame() {
-	
-	// set up the 'animation' frames
-	animFrames = 
 	
 	// build a spritesheet up from the image we have loaded
     spriteSheet = new SpriteSheet({
@@ -120,6 +182,7 @@ function buildGame() {
     // build a stage object to hold our game board
     stage = new Stage(game);
     stage.mouseEventsEnabled = true; // allow mouse events
+    stage.enableMouseOver(); // allow mouseover events
     
     // set up a game ticker
     Ticker.addListener(window);
@@ -127,24 +190,32 @@ function buildGame() {
     Ticker.setFPS(60);
  
     // initialise the game board
-    for (var i = 2; i < 11; i++) {
+    map = [];
+    for (var i = 0; i < 11; i++) {
     	var line = [];
     	for (var j = 0; j < 11; j++) {
     		/// create a new bitmap animation
     		var bma = new BitmapAnimation(spriteSheet);
     		
     		// set up the correct bitmap
-    		if (j == 0)
-    		{
+    		if (i > 7) {
     			bma.gotoAndPlay("blank");
-    		} else if (j == 1){
-    			bma.gotoAndPlay("place_yellow");
     		} else {
-    			bma.gotoAndPlay("empty_cell");
+    			if (j == 0)
+	    		{
+	    			bma.gotoAndPlay("blank");
+	    		} else if (j == 1){
+	    			bma.gotoAndPlay((current_team == YELLOW) ? "place_yellow" : "place_red");
+    				bma.onMouseOver = changePlaceMouseOver;
+    				bma.onMouseOut = changePlaceMouseOut;
+    				bma.onPress = placeDiscEvent;
+	    		} else {
+	    			bma.gotoAndPlay("empty_cell");
+	    		}
     		}
     		
     		// configure the bitmap animation position
-    		bma.name="cell"+i+"-"+j;
+    		bma.name=i+":"+j;
     		bma.x = i * CELL_SIZE;
     		bma.y = j * CELL_SIZE;
     		stage.addChild(bma);
@@ -153,7 +224,6 @@ function buildGame() {
     	map.push(line);
     }
 }
-
 
 /*
  * The tick function updates the stage based on the game state
