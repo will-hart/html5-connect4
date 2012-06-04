@@ -20,12 +20,12 @@
 
 
 /* define sprite colours */
-var NONE = 0; 
+var NONE = 0;
 var YELLOW = 1;
 var RED = 2;
 
 /* the current team */
-var current_team = RED;
+var current_team = YELLOW;
 
 /* define some sprite states */
 var EMPTY_CELL = 0; 		// a disc in the game board
@@ -128,6 +128,9 @@ function changePlaceMouseOut(MouseArgs) {
  */
 function placeDiscEvent(MouseArgs)
 {
+	// make sure we haven't found a winner
+	if (current_team == NONE) return; 
+	
 	// get the placeholder that was clicked
 	var t = MouseArgs.target;
 	
@@ -140,8 +143,10 @@ function placeDiscEvent(MouseArgs)
 	var placed = false;
 	
 	// now traverse back up the column and place a disc in the first empty block
-	for(var i = 9; i > 1; i--) {
-		var bma = map[col][i]; // get the bitmap
+	var row;
+	var bma;
+	for(row = 9; row > 1; row--) {
+		bma = map[col][row]; // get the bitmap
 		
 		// if it is empty, place
 		if (bma.currentAnimation == "empty_cell") {
@@ -153,14 +158,92 @@ function placeDiscEvent(MouseArgs)
 	
 	// move to the next player's turn
 	if (placed) {
-		checkForWinner();
+		checkForWinner(row, col, 1, current_team, -1, -1);
 		newTurn();
 	} 
 }
 
 
-function checkForWinner() {
-	return false;
+/*
+ * Checks if there are four in a row anywhere on the board
+ */
+function checkForWinner(row, col, level, team, prev_row, prev_col) {
+	
+	// the cell we want to see for a win
+	var win_cell = (current_team == YELLOW) ? "yellow_cell" : "red_cell";
+	var check = false;
+
+	// ensure int
+	row = parseInt(row);
+	col = parseInt(col);
+	level = parseInt(level);
+	prev_row = parseInt(prev_row);
+	prev_col = parseInt(prev_col);
+	
+	// check bounds
+	if( row > 9 || row < 2 || col > 7 || col < 0) {
+		console.log("Cell " + row + "," + col + " is out of bounds");
+		return false;
+	}
+	
+	// get the map object
+	var bma = map[col][row];
+	
+	console.log("Checking cell for " + win_cell + ", found " + bma.currentAnimation);
+	// check if this is the right colour cell
+	if( bma.currentAnimation == win_cell) {
+		
+		if (level == 4) { //FTW???
+			console.log("Level 4 Do we have a winner???");
+			declareWinner(row, col, team);
+			return true; // the fourth in a row and in the correct colour
+		
+		} else {
+			// no the fourth but still the correct colour - test again
+			if (level == 1) {
+				console.log("level 1, checking surrounding");
+				// test in every direction
+				for(var r = -1; r < 2; r++) {
+					for (var c =-1; c < 2; c++) {
+						if (r != 0 || c != 0) { // prevent checking the same cell repeatedly
+							if (checkForWinner(row + r, col + c, level + 1, team, row, col)) {
+								declareWinner(row,col,team);
+								current_team = NONE;
+								return true;
+							}
+						}
+					}
+				}
+			
+			} else {
+				console.log("Another level");
+				// only test in the same direction we are already looking
+				var del_row = row - prev_row;
+				var del_col = col - prev_col;
+				
+				if (checkForWinner(eval(row + del_row), eval(col + del_col), level + 1, team, row, col)) {
+					declareWinner(row,col,team);
+					return true;
+				} else {
+					return false;
+				}		
+			}
+		}
+
+	} else {
+		return false; // wrong colour, stop checking
+	}
+	
+	return true;
+}
+
+
+/* 
+ * 'Declares' a winner, by highlighting the winning disc
+ */
+function declareWinner(row, col, team) {
+	var win_str = (team == YELLOW) ? "win_yellow" : "win_red";
+	map[col][row].gotoAndPlay(win_str);
 }
 
 /*
