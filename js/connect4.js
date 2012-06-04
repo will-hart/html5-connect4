@@ -177,26 +177,22 @@ function checkForWinner(row, col, level, team, prev_row, prev_col) {
 	
 	// check bounds
 	if( row > 9 || row < 2 || col > 7 || col < 0) {
-		console.log("Cell " + row + "," + col + " is out of bounds");
 		return false;
 	}
 	
 	// get the map object
 	var bma = map[col][row];
 	
-	console.log("Checking cell for " + win_cell + ", found " + bma.currentAnimation);
 	// check if this is the right colour cell
 	if( bma.currentAnimation == win_cell) {
 		
 		if (level == 4) { //FTW???
-			console.log("Level 4 Do we have a winner???");
 			declareWinner(row, col, team);
 			return true; // the fourth in a row and in the correct colour
 		
 		} else {
 			// no the fourth but still the correct colour - test again
 			if (level == 1) {
-				console.log("level 1, checking surrounding");
 				// test in every direction
 				for(var r = -1; r < 2; r++) {
 					for (var c =-1; c < 2; c++) {
@@ -210,7 +206,6 @@ function checkForWinner(row, col, level, team, prev_row, prev_col) {
 				}
 			
 			} else {
-				console.log("Another level");
 				// only test in the same direction we are already looking
 				var del_row = row - prev_row;
 				var del_col = col - prev_col;
@@ -275,7 +270,7 @@ function buildGame() {
 	// build a spritesheet up from the image we have loaded
     spriteSheet = new SpriteSheet({
 	    images: [spriteImage], 
-	    frames: {width: 64, height: 64, count: 12, regX: 1, regY: 1},
+	    frames: {width: CELL_SIZE, height: CELL_SIZE, count: 12, regX: 1, regY: 1},
 	    animations: {
 			blank: [9],
 			empty_cell: [0],
