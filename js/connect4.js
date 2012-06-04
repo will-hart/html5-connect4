@@ -26,7 +26,7 @@ var RED = 2;
 
 /* define some map dimensions */
 var max_row = 6;
-var max_col = 8;
+var max_col = 7;
 var header_rows = 2;
 
 /* the current team */
@@ -145,7 +145,7 @@ function placeDiscEvent(MouseArgs) {
 	// now traverse back up the column and place a disc in the first empty block
 	var row;
 	var bma;
-	for(row = 9; row > 1; row--) {
+	for(row = max_row + header_rows - 1; row > 1; row--) {
 		bma = map[col][row]; // get the bitmap
 		
 		// if it is empty, place
@@ -168,7 +168,7 @@ function placeDiscEvent(MouseArgs) {
  * Checks if there are four in a row anywhere on the board
  */
 function checkForWinner(row, col, level, team, prev_row, prev_col) {
-	
+
 	// the cell we want to see for a win
 	var win_cell = (current_team == YELLOW) ? "yellow_cell" : "red_cell";
 	var check = false;
@@ -181,7 +181,7 @@ function checkForWinner(row, col, level, team, prev_row, prev_col) {
 	prev_col = parseInt(prev_col);
 	
 	// check bounds
-	if( row > 9 || row < 2 || col > 7 || col < 0) {
+	if(row >= max_row + header_rows || row < 2 || col >= max_col || col < 0) {
 		return false;
 	}
 	
@@ -261,8 +261,8 @@ function newTurn() {
 	}
 	
 	// set the placement images at the top of the board
-	for (var i = 0; i < 8; i++) {
-		var bma = map[i][1];
+	for (var col = 0; col < max_col; col++) {
+		var bma = map[col][1];
 		bma.gotoAndPlay(bma_string);
 	}
 }
@@ -302,14 +302,14 @@ function buildGame() {
  
     // initialise the game board
     map = [];
-    for (var col = 0; col < 11; col++) {
+    for (var col = 0; col < max_col; col++) {
     	var line = [];
-    	for (var row = 0; row < 11; row++) {
+    	for (var row = 0; row < max_row + header_rows; row++) {
     		/// create a new bitmap animation
     		var bma = new BitmapAnimation(spriteSheet);
     		
     		// set up the correct bitmap
-    		if (col > 7) {
+    		if (col > max_col) {
     			bma.gotoAndPlay("blank");
     		} else {
     			if (row == 0)
