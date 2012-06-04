@@ -158,7 +158,7 @@ function placeDiscEvent(MouseArgs) {
 	
 	// move to the next player's turn
 	if (placed) {
-		checkForWinner(row, col, 1, current_team, -1, -1);
+		checkForWinner(row, col, current_team);
 		newTurn();
 	} 
 }
@@ -167,79 +167,76 @@ function placeDiscEvent(MouseArgs) {
 /*
  * Checks if there are four in a row anywhere on the board
  */
-function checkForWinner(row, col, level, team, prev_row, prev_col) {
+function checkForWinner(row, col, team) {
 
 	// the cell we want to see for a win
-	var win_cell = (current_team == YELLOW) ? "yellow_cell" : "red_cell";
-	var check = false;
+	var win_cell = (team == YELLOW) ? "yellow_cell" : "red_cell";
+	var win_string = (team == YELLOW) ? "win_yellow" : "win_red";
+	var winner = false;
+	
+	// check in the four possible directions (east-west, north-south, NE-SW and NW-SW)
+	var E_W = countInDirection(row, col, 0, 1, win_cell) + countInDirection(row, col, 0, -1, win_cell);// check if we won!
+	if (E_W > 4) {
+		current_team = NONE;
+		countInDirection(row, col, 0, 1, win_cell, win_string);
+		countInDirection(row, col, 0, -1, win_cell, win_string);
+		return true;
+	} 
+	
+	
+	var N_S = countInDirection(row, col, -1, 0, win_cell) + countInDirection(row, col, 1, 0, win_cell);
+	if (N_S > 4) {
+		current_team = NONE;
+		countInDirection(row, col, -1, 0, win_cell, win_string);
+		countInDirection(row, col, 1, 0, win_cell, win_string);
+		return true;
+	} 
+	
+	
+	var NE_SW = countInDirection(row, col, -1, 1, win_cell) + countInDirection(row, col, 1, -1, win_cell);
+	if (NE_SW > 4) {
+		current_team = NONE;
+		countInDirection(row, col, -1, 1, win_cell, win_string);
+		countInDirection(row, col, 1, -1, win_cell, win_string);
+		return true;
+	} 
+	
+	
+	var NW_SE = countInDirection(row, col, -1, -1, win_cell) + countInDirection(row, col, 1, 1, win_cell);
+	if (NW_SE > 4) {
+		current_team = NONE;
+		countInDirection(row, col, -1, -1, win_cell, win_string);
+		countInDirection(row, col, 1, 1, win_cell, win_string);
+		return true;
+	} 
+	
+	return false;
+}
 
-	// ensure int
-	row = parseInt(row);
-	col = parseInt(col);
-	level = parseInt(level);
-	prev_row = parseInt(prev_row);
-	prev_col = parseInt(prev_col);
+
+/*
+ * Count the number of consecutive cells of the same colour 
+ * in a given direction
+ */ 
+function countInDirection(row, col, delRow, delCol, animString, winString) {
+	// get the new co-ordinates
+	var newRow = row*1 + delRow*1;
+	var newCol = col*1 + delCol*1;
 	
 	// check bounds
-	if(row >= max_row + header_rows || row < 2 || col >= max_col || col < 0) {
-		return false;
+	if (row >= max_row + header_rows || row < header_rows+1 || col < 0 || col >= max_col) {
+		return 0;
 	}
 	
-	// get the map object
-	var bma = map[col][row];
-	
-	// check if this is the right colour cell
-	if( bma.currentAnimation == win_cell) {
-		
-		if (level == 4) { //FTW???
-			declareWinner(row, col, team);
-			return true; // the fourth in a row and in the correct colour
-		
-		} else {
-			// no the fourth but still the correct colour - test again
-			if (level == 1) {
-				// test in every direction
-				for(var r = -1; r < 2; r++) {
-					for (var c =-1; c < 2; c++) {
-						if (r != 0 || c != 0) { // prevent checking the same cell repeatedly
-							if (checkForWinner(row + r, col + c, level + 1, team, row, col)) {
-								declareWinner(row,col,team);
-								return true;
-							}
-						}
-					}
-				}
-			
-			} else {
-				// only test in the same direction we are already looking
-				var del_row = row - prev_row;
-				var del_col = col - prev_col;
-				
-				if (checkForWinner(eval(row + del_row), eval(col + del_col), level + 1, team, row, col)) {
-					declareWinner(row,col,team);
-					return true;
-				} else {
-					return false;
-				}		
-			}
-		}
-
+	// check if this cell is the correct colour
+	if (map[col][row].currentAnimation == animString) {
+		if (winString != null) map[col][row].gotoAndPlay(winString);
+		return ret = countInDirection(newRow, newCol, delRow, delCol, animString, winString) + 1;
 	} else {
-		return false; // wrong colour, stop checking
+		return 0;
 	}
-	
-	return true;
 }
 
-
-/* 
- * 'Declares' a winner, by highlighting the winning disc
- */
-function declareWinner(row, col, team) {
-	var win_str = (team == YELLOW) ? "win_yellow" : "win_red";
-	map[col][row].gotoAndPlay(win_str);
-	current_team = NONE;
-}
 
 /*
  * Changes the currently active team
